@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contrôle Source OBS</title>
+    <title>Contrôle Live OBS - 3 Sources</title>
     <style>
         body, html {
             margin: 0;
@@ -12,59 +12,80 @@
             overflow: hidden;
             background: transparent;
         }
-        iframe {
+        /* Style pour tous les éléments de l'overlay */
+        .overlay-item {
             width: 1080px;
             height: 1920px;
             border: none;
             position: absolute;
             top: 0;
             left: 0;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.5s ease-in-out; /* Transition douce de 0.5s */
             opacity: 0;
+            pointer-events: none;
         }
-        iframe.active {
+        /* Classe qui affiche l'élément actif */
+        .active {
             opacity: 1;
+            pointer-events: auto;
         }
     </style>
 </head>
 <body>
 
-    <iframe id="source1" src="24update overlay_live_1080x1920.html"></iframe>
-    <iframe id="source2" src="file_00000000c15071f4829de158d17f3c07.png"></iframe>
-    <iframe id="source3" src="refresh.html"></iframe>
+    <iframe id="source1" class="overlay-item" src="24update overlay_live_1080x1920.html"></iframe>
+
+    <img id="source2" class="overlay-item" src="file_00000000c15071f4829de158d17f3c07.png" alt="Transition">
+
+    <iframe id="source3" class="overlay-item" src="refresh.html"></iframe>
 
     <script>
-        const s1 = document.getElementById('source1'); // Dettes (1 min)
-        const s2 = document.getElementById('source2'); // Transition (30 sec)
-        const s3 = document.getElementById('source3'); // News (3 min)
+        const s1 = document.getElementById('source1'); // Dettes
+        const s2 = document.getElementById('source2'); // Transition PNG
+        const s3 = document.getElementById('source3'); // News
 
-        function cycle() {
-            // 1. Afficher Source 1 (Dettes) - Masquer le reste
+        // Configuration des temps (en millisecondes)
+        const tempsDettes = 60000;     // 1 minute (60 secondes)
+        const tempsTransition = 30000; // 30 secondes
+        const tempsNews = 180000;      // 3 minutes (180 secondes)
+
+        function etape1Dettes() {
+            console.log("Étape 1 : Affichage Dettes (1 min)");
+            
+            // On cache les News, on affiche les Dettes
             s3.classList.remove('active');
             s1.classList.add('active');
 
-            // Attendre 1 minute (60 000 ms)
-            setTimeout(() => {
-                
-                // 2. Afficher Source 2 (Transition)
-                s1.classList.remove('active');
-                s2.classList.add('active');
-
-                // Attendre 30 secondes (30 000 ms)
-                setTimeout(() => {
-                    
-                    // 3. Afficher Source 3 (News)
-                    s2.classList.remove('active');
-                    s3.classList.add('active');
-
-                    // Attendre 3 minutes (180 000 ms) avant de recommencer la boucle
-                    setTimeout(cycle, 180000);
-
-                }, 30000);
-            }, 60000);
+            // Au bout d'une minute, on passe à la transition
+            setTimeout(etape2Transition, tempsDettes);
         }
 
-        window.onload = cycle;
+        function etape2Transition() {
+            console.log("Étape 2 : Affichage Transition PNG (30 sec)");
+            
+            // On cache les Dettes, on affiche le PNG
+            s1.classList.remove('active');
+            s2.classList.add('active');
+
+            // Au bout de 30 secondes, on passe aux News
+            setTimeout(etape3News, tempsTransition);
+        }
+
+        function etape3News() {
+            console.log("Étape 3 : Affichage News (3 min)");
+            
+            // On cache le PNG, on affiche les News
+            s2.classList.remove('active');
+            s3.classList.add('active');
+
+            // Au bout de 3 minutes, on recommence toute la boucle à zéro
+            setTimeout(etape1Dettes, tempsNews);
+        }
+
+        // Lance automatiquement le cycle dès que la page est chargée dans OBS
+        window.onload = function() {
+            etape1Dettes();
+        };
     </script>
 </body>
 </html>
