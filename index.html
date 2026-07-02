@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contrôle Live OBS - 3 Sources Synchronisées</title>
+    <title>Contrôle Live OBS - 3 Sources Directes</title>
     <style>
         body, html {
             margin: 0;
@@ -35,19 +35,19 @@
 
     <img id="source2" class="overlay-item" src="file_00000000c15071f4829de158d17f3c07.png" alt="Transition">
 
-    <iframe id="source3" class="overlay-item" src="refresh.html"></iframe>
+    <iframe id="source3" class="overlay-item" src="https://maxmcneil.github.io/mywebrankin/"></iframe>
 
     <script>
         const s1 = document.getElementById('source1'); // Dettes
         const s2 = document.getElementById('source2'); // Transition PNG
-        const s3 = document.getElementById('source3'); // News
+        const s3 = document.getElementById('source3'); // News directes
 
         const tempsDettes = 60000;     // 1 minute
         const tempsTransition = 30000; // 30 secondes
         const tempsNews = 180000;      // 3 minutes
 
         let cycleCount = 0;
-        const cyclesBeforeNewsRefresh = 7; // Environ 30 minutes (7 cycles x 4,5 min)
+        const cyclesBeforeNewsRefresh = 7; // Environ 30 minutes
 
         function etape1Dettes() {
             console.log("Étape 1 : Affichage Dettes");
@@ -72,12 +72,12 @@
 
             cycleCount++;
             
-            // On vérifie si cela fait environ 30 minutes
+            // Toutes les 30 minutes environ, on force le rafraîchissement du lien direct
             if (cycleCount >= cyclesBeforeNewsRefresh) {
-                console.log("Rafraîchissement du flux de News !");
-                s3.src = ""; // On réinitialise la source
-                setTimeout(() => { s3.src = "refresh.html"; }, 100);
-                cycleCount = 0; // On remet le compteur à zéro
+                console.log("Rafraîchissement du flux de News en direct !");
+                s3.src = ""; 
+                setTimeout(() => { s3.src = "https://maxmcneil.github.io/mywebrankin/"; }, 100);
+                cycleCount = 0; 
             }
 
             setTimeout(etape1Dettes, tempsNews);
