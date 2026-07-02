@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>LIVE STREAM - DETTE EN DIRECT</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050508;
+            color: #ffffff;
+            font-family: 'Arial Black', sans-serif;
+            margin: 0;
+            padding: 100px 40px;
+            width: 1080px;
+            height: 1920px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 1. LE SCANNER LASER PERPÉTUEL */
+        .laser-scanner {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, transparent, #ff0000, #facc15, #ff0000, transparent);
+            box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+            z-index: 9999;
+            pointer-events: none;
+            animation: scanAnimation 4s ease-in-out infinite;
+        }
+
+        @keyframes scanAnimation {
+            0% { top: 0%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* 2. MOUVEMENTS ARTISTIQUES PERPÉTUELS */
+        @keyframes floatA { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(2px, 4px) rotate(0.2deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+        @keyframes floatB { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-3px, 2px) rotate(-0.3deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+        @keyframes floatC { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(3px, -2px) rotate(0.1deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+
+        /* Décalage ajouté ici pour éviter le chevauchement (margin-top) */
+        .header-container { text-align: center; animation: floatA 3s ease-in-out infinite; margin-top: 40px; }
+        .card-main { animation: floatB 4s ease-in-out infinite; }
+        .card-orange { animation: floatC 3.5s ease-in-out infinite; }
+        .card-yellow { animation: floatA 4.5s ease-in-out infinite; }
+        .card-cyan { animation: floatB 5s ease-in-out infinite; }
+        .interactive-cta-box { animation: floatC 4s ease-in-out infinite; }
+
+        /* TITRE AVEC DÉGRADÉ BLANC-ROUGE-BLANC FLOTTANT */
+        .gros-titre-alarmant {
+            font-size: 56px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0 0 25px 0;
+            line-height: 1.2;
+            background: linear-gradient(to right, #ffffff, #e10606, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .alert-banner {
+            background: #e10606; 
+            padding: 18px;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 20px rgba(225, 6, 6, 0.6);
+        }
+
+        .main-dashboard { display: flex; flex-direction: column; gap: 35px; width: 100%; }
+        .counter-row-twin { display: flex; gap: 30px; width: 100%; }
+        .counter-row-twin .premium-card { flex: 1; }
+
+        .premium-card {
+            background: #0f111a;
+            border: 3px solid #1f2335;
+            padding: 40px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .counter-title {
+            font-size: 34px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0 0 15px 0;
+            letter-spacing: 1px;
+        }
+
+        .counter-value {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-weight: 900;
+            line-height: 1.1;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        .card-main { border: 4px solid #e10606; background: #140505; }
+        .card-main .counter-title { color: #ff4d4d; font-size: 46px; } 
+        .card-main .counter-value { font-size: 78px; color: #ffffff; }
+        
+        .card-orange { border-left: 12px solid #f97316; }
+        .card-orange .counter-title { color: #f97316; }
+        .card-orange .counter-value { font-size: 54px; color: #facc15; }
+        
+        .card-yellow { border-left: 12px solid #e10606; }
+        .card-yellow .counter-title { color: #ef4444; }
+        .card-yellow .counter-value { font-size: 54px; color: #ffffff; }
+        
+        .card-cyan { border: 3px solid #facc15; background: #11100b; }
+        .card-cyan .counter-title { color: #facc15; }
+        .card-cyan .counter-value { font-size: 68px; color: #ffffff; }
+
+        .ticker-container {
+            background: #e10606;
+            padding: 16px 0;
+            white-space: nowrap;
+            width: 100%;
+            border-top: 3px solid #ffffff;
+            border-bottom: 3px solid #ffffff;
+        }
+        .ticker-wrap { display: inline-block; padding-left: 100%; animation: marquee 25s linear infinite; }
+        .ticker-item { display: inline-block; padding: 0 3rem; font-size: 24px; font-weight: 900; color: #ffffff; }
+
+        @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
+        .cyber-popup-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 900px;
+            background: #050508;
+            border: 6px solid #e10606;
+            box-shadow: 0 0 80px rgba(225, 6, 6, 0.9);
+            padding: 50px;
+            z-index: 999999;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+
+        .cyber-popup-overlay.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-alert-header {
+            color: #ffffff; background: #e10606; display: inline-block;
+            font-size: 30px; font-weight: 900; text-transform: uppercase;
+            padding: 6px 24px; margin-bottom: 28px; text-shadow: 2px 2px 0px #000;
+        }
+
+        .popup-question { font-size: 36px; font-weight: 900; line-height: 1.3; color: #ffffff; margin-bottom: 44px; }
+        .popup-choices { background: #facc15; padding: 25px; display: flex; justify-content: center; gap: 24px; }
+        .popup-btn { border: 4px solid #000000; color: #000000; padding: 20px 40px; font-size: 26px; font-weight: 900; text-transform: uppercase; cursor: pointer; width: 48%; }
+        .popup-btn.btn-right { background: #e10606; color: #ffffff; }
+
+        .bottom-disclaimer-zone { width: 100%; background: #000000; border-top: 2px solid #1f2335; padding-top: 20px; }
+        .meta-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: #e10606; margin-bottom: 10px; }
+        .legal-text { font-family: system-ui, sans-serif; font-size: 14px; color: #64748b; text-align: justify; }
+    </style>
+</head>
+<body>
+
+    <div class="laser-scanner"></div>
+
+    <div class="header-container">
+        <h1 class="gros-titre-alarmant">COMPTEUR DE LA DETTE FRANÇAISE</h1>
+        <div class="alert-banner">🚨 FLASH INFO : ANALYSE EN DIRECT CRITIQUE 🚨</div>
+    </div>
+
+    <div class="main-dashboard">
+        <div class="premium-card card-main">
+            <h2 class="counter-title">Dette de la France</h2>
+            <div class="counter-value" id="dette-publique">0,00 €</div>
+        </div>
+
+        <div class="counter-row-twin">
+            <div class="premium-card card-orange">
+                <h2 class="counter-title">Dette / Habitant</h2>
+                <div class="counter-value" id="dette-habitant">0,00000 €</div>
+            </div>
+            <div class="premium-card card-yellow">
+                <h2 class="counter-title">Dette Sécurité Sociale</h2>
+                <div class="counter-value" id="dette-secu">0,00 €</div>
+            </div>
+        </div>
+
+        <div class="interactive-cta-box">
+            <h2 style="font-size:36px; margin:0; text-transform:uppercase;">MIS À JOUR INTERNE : <span id="live-date">--/--/----</span> - <span id="live-time" style="color:#facc15;">--:--:--</span></h2>
+        </div>
+
+        <div class="ticker-container">
+            <div class="ticker-wrap">
+                <div class="ticker-item">⚠️ DETTE PUBLIQUE : +5 707 EUROS CHAQUE SECONDE ⚠️</div>
+                <div class="ticker-item">⚠️ ALERTE CRASH INTERNATIONALE ACCÉLÉRÉE ⚠️</div>
+            </div>
+        </div>
+
+        <div class="premium-card card-cyan">
+            <h2 class="counter-title">Dépenses Publiques (Cumul annuel)</h2>
+            <div class="counter-value" id="depenses-publiques">0,00 €</div>
+        </div>
+    </div>
+
+    <div class="bottom-disclaimer-zone">
+        <div class="meta-row"><div>TRANSPARENCE ALGORITHMIQUE</div><div>CONFORME STREAMING LIVE YOUTUBE</div></div>
+        <div class="legal-text"><strong>Exonération :</strong> Estimation statistique basée sur les tendances macroéconomiques réelles. Les données officielles étant trimestrielles, ce compteur applique un algorithme autonome fluide à des fins d'illustration et d'information de l'audience.</div>
+    </div>
+
+    <div class="cyber-popup-overlay" id="interactive-popup">
+        <div class="popup-alert-header">SÉANCE DE VOTE EN DIRECT</div>
+        <div class="popup-question" id="popup-question-text">SOMMES-NOUS EN TRAIN DE VOLER L'AVENIR DE NOS ENFANTS ?</div>
+        <div class="popup-choices">
+            <button class="popup-btn" style="background:#fff;">OUI, TOTALEMENT</button>
+            <button class="popup-btn btn-right">NON, INFONDÉ</button>
+        </div>
+    </div>
+
+    <script>
+        const DATA_2026 = {
+            dette: { base: 3546633066952.24, vitesse: 5707.00 },     
+            secu: { base: 314856409145.80, vitesse: 1150.00 },       
+            depenses: { base: 1723571531405.37, vitesse: 634.19 },    
+            population: 68400000 
+        };
+        const START_TIME = new Date("2026-06-24T17:22:00").getTime();
+
+        function updateLiveCounters() {
+            const now = Date.now();
+            const secondsElapsed = (now - START_TIME) / 1000;
+            const currentDette = DATA_2026.dette.base + (secondsElapsed * DATA_2026.dette.vitesse) + (Math.sin(secondsElapsed * 0.5) * 45000);
+            const currentSecu = DATA_2026.secu.base + (secondsElapsed * DATA_2026.secu.vitesse);
+            const currentDepenses = DATA_2026.depenses.base + (secondsElapsed * DATA_2026.depenses.vitesse);
+            const currentHabitant = currentDette / DATA_2026.population;
+
+            document.getElementById('dette-publique').innerText = currentDette.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('dette-secu').innerText = currentSecu.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('depenses-publiques').innerText = currentDepenses.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+            document.getElementById('dette-habitant').innerText = currentHabitant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+
+            const d = new Date();
+            document.getElementById('live-date').innerText = String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+            document.getElementById('live-time').innerText = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+        }
+        setInterval(updateLiveCounters, 50);
+
+        const AudioBipeur = {
+            ctx: null,
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            playBip(freq, duration, type = 'sine', vol = 0.15) {
+                try {
+                    this.init();
+                    let osc = this.ctx.createOscillator();
+                    let gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(); osc.stop(this.ctx.currentTime + duration);
+                } catch(e){}
+            }
+        };
+
+        setInterval(() => { AudioBipeur.playBip(440, 0.05, 'sine', 0.04); }, 4000);
+
+        const QUESTIONS = [
+            "Faut-il geler immédiatement le versement de toutes les aides sociales ?",
+            "Sommes-nous en train de détruire l'avenir des jeunes ?",
+            "L'État est-il en état de faillite virtuelle cachée ?",
+            "Faut-il supprimer la moitié des fonctionnaires pour éponger la dette ?",
+            "Où passe l'argent public ? Services ou pur gaspillage ?",
+            "Taxer massivement les riches : solution miracle ou suicide économique ?",
+            "Faillite complète d'ici 2030 : Scénario inévitable ?"
+        ];
+        let qIndex = 0;
+        const popupEl = document.getElementById('interactive-popup');
+        const qTxtEl = document.getElementById('popup-question-text');
+
+        function triggerPopupLoop() {
+            qTxtEl.innerText = QUESTIONS[qIndex];
+            AudioBipeur.playBip(880, 0.15, 'square', 0.15);
+            setTimeout(() => AudioBipeur.playBip(1100, 0.10, 'sine', 0.15), 60);
+            popupEl.classList.add('active');
+            setTimeout(() => {
+                AudioBipeur.playBip(350, 0.20, 'sine', 0.1);
+                popupEl.classList.remove('active');
+                qIndex = (qIndex + 1) % QUESTIONS.length;
+                setTimeout(triggerPopupLoop, 12000);
+            }, 8000);
+        }
+        setTimeout(triggerPopupLoop, 5000);
+    </script>
+</body>
+</html>
