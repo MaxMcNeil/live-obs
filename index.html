@@ -56,7 +56,7 @@
 
         function etape1Dettes() {
             console.log("Étape 1 : Affichage Dettes");
-            s4.classList.remove('active'); // Masque l'écran précédent (Ransomware)
+            s4.classList.remove('active'); 
             s1.classList.add('active');
 
             setTimeout(etape2Transition, tempsDettes);
@@ -91,11 +91,9 @@
         function etape4Ransomware() {
             console.log("Étape 4 : Affichage Ransomware France");
             s3.classList.remove('active');
-            s4.classList.add('active');
             
-            // On en profite pour forcer la mise à jour des alertes cyber à chaque passage
-            s4.src = "";
-            setTimeout(() => { s4.src = "https://maxmcneil.github.io/mywebrankin/ransomware-fr.html"; }, 100);
+            // CORRECTION : On affiche l'iframe instantanément sans casser son cycle de vie ni vider son contenu
+            s4.classList.add('active');
 
             // Au bout d'une minute, on reboucle sur les dettes
             setTimeout(etape1Dettes, tempsRansomware);
