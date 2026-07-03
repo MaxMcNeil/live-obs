@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contrôle Live OBS - 3 Sources Directes</title>
+    <title>Contrôle Live OBS - 4 Sources Automatiques</title>
     <style>
         body, html {
             margin: 0;
@@ -37,21 +37,26 @@
 
     <iframe id="source3" class="overlay-item" src="https://maxmcneil.github.io/mywebrankin/"></iframe>
 
+    <iframe id="source4" class="overlay-item" src="https://maxmcneil.github.io/mywebrankin/ransomware-fr.html"></iframe>
+
     <script>
         const s1 = document.getElementById('source1'); // Dettes
         const s2 = document.getElementById('source2'); // Transition PNG
         const s3 = document.getElementById('source3'); // News directes
+        const s4 = document.getElementById('source4'); // Ransomware FR
 
-        const tempsDettes = 60000;     // 1 minute
-        const tempsTransition = 30000; // 30 secondes
-        const tempsNews = 180000;      // 3 minutes
+        // Configurations des timings (en millisecondes)
+        const tempsDettes = 60000;      // 1 minute
+        const tempsTransition = 30000;  // 30 secondes
+        const tempsNews = 180000;       // 3 minutes
+        const tempsRansomware = 60000;  // 1 minute
 
         let cycleCount = 0;
-        const cyclesBeforeNewsRefresh = 7; // Environ 30 minutes
+        const cyclesBeforeNewsRefresh = 6; // Environ 30 minutes (6 cycles complets)
 
         function etape1Dettes() {
             console.log("Étape 1 : Affichage Dettes");
-            s3.classList.remove('active');
+            s4.classList.remove('active'); // Masque l'écran précédent (Ransomware)
             s1.classList.add('active');
 
             setTimeout(etape2Transition, tempsDettes);
@@ -72,7 +77,7 @@
 
             cycleCount++;
             
-            // Toutes les 30 minutes environ, on force le rafraîchissement du lien direct
+            // Rafraîchissement du flux News toutes les 30 min
             if (cycleCount >= cyclesBeforeNewsRefresh) {
                 console.log("Rafraîchissement du flux de News en direct !");
                 s3.src = ""; 
@@ -80,7 +85,20 @@
                 cycleCount = 0; 
             }
 
-            setTimeout(etape1Dettes, tempsNews);
+            setTimeout(etape4Ransomware, tempsNews);
+        }
+
+        function etape4Ransomware() {
+            console.log("Étape 4 : Affichage Ransomware France");
+            s3.classList.remove('active');
+            s4.classList.add('active');
+            
+            // On en profite pour forcer la mise à jour des alertes cyber à chaque passage
+            s4.src = "";
+            setTimeout(() => { s4.src = "https://maxmcneil.github.io/mywebrankin/ransomware-fr.html"; }, 100);
+
+            // Au bout d'une minute, on reboucle sur les dettes
+            setTimeout(etape1Dettes, tempsRansomware);
         }
 
         window.onload = function() {
