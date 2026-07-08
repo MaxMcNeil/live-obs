@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contrôle Live OBS - 4 Sources Automatiques</title>
+    <title>Contrôle Live OBS - 3 Sources Automatiques</title>
+
     <style>
-        body, html {
+        html, body {
             margin: 0;
             padding: 0;
             width: 1080px;
@@ -12,17 +13,19 @@
             overflow: hidden;
             background: transparent;
         }
+
         .overlay-item {
-            width: 1080px;
-            height: 1920px;
-            border: none;
             position: absolute;
             top: 0;
             left: 0;
-            transition: opacity 0.5s ease-in-out;
+            width: 1080px;
+            height: 1920px;
+            border: none;
             opacity: 0;
             pointer-events: none;
+            transition: opacity .5s ease-in-out;
         }
+
         .active {
             opacity: 1;
             pointer-events: auto;
@@ -31,77 +34,90 @@
 </head>
 <body>
 
-    <iframe id="source1" class="overlay-item" src="24update overlay_live_1080x1920.html"></iframe>
+    <!-- Source 1 -->
+    <iframe
+        id="source1"
+        class="overlay-item"
+        src="24update overlay_live_1080x1920.html">
+    </iframe>
 
-    <img id="source2" class="overlay-item" src="file_00000000c15071f4829de158d17f3c07.png" alt="Transition">
+    <!-- Transition -->
+    <img
+        id="source2"
+        class="overlay-item"
+        src="file_00000000c15071f4829de158d17f3c07.png"
+        alt="Transition">
 
-    <iframe id="source3" class="overlay-item" src="https://maxmcneil.github.io/mywebrankin/"></iframe>
+    <!-- France Live News -->
+    <iframe
+        id="source3"
+        class="overlay-item"
+        src="https://maxmcneil.github.io/FranceLiveNews/">
+    </iframe>
 
-    <iframe id="source4" class="overlay-item" src="https://maxmcneil.github.io/mywebrankin/ransomware-fr.html"></iframe>
+<script>
+const s1 = document.getElementById("source1");
+const s2 = document.getElementById("source2");
+const s3 = document.getElementById("source3");
 
-    <script>
-        const s1 = document.getElementById('source1'); // Dettes
-        const s2 = document.getElementById('source2'); // Transition PNG
-        const s3 = document.getElementById('source3'); // News directes
-        const s4 = document.getElementById('source4'); // Ransomware FR
+// Durées
+const tempsSource1 = 30000;      // 30 s
+const tempsTransition = 5000;    // 5 s
+const tempsNews = 60000;         // 1 min
 
-        // Configurations des timings (en millisecondes)
-        const tempsDettes = 30000;      // 30 secondes
-        const tempsTransition = 6000;  // 6 secondes
-        const tempsNews = 60000;       // 1 minutes
-        const tempsRansomware = 60000;  // 1 minutes
+// Rafraîchissement des iframes toutes les 20 min
+const refreshInterval = 20 * 60 * 1000;
 
-        let cycleCount = 0;
-        const cyclesBeforeNewsRefresh = 11; // Environ 21 minutes (11 cycles complets)
+// Rafraîchissement automatique
+setInterval(() => {
+    console.log("Rafraîchissement des iframes...");
 
-        function etape1Dettes() {
-            console.log("Étape 1 : Affichage Dettes");
-            s4.classList.remove('active'); 
-            s1.classList.add('active');
+    s1.src = "";
+    s3.src = "";
 
-            setTimeout(etape2Transition, tempsDettes);
-        }
+    setTimeout(() => {
+        s1.src = "24update overlay_live_1080x1920.html";
+        s3.src = "https://maxmcneil.github.io/FranceLiveNews/";
+    }, 100);
 
-        function etape2Transition() {
-            console.log("Étape 2 : Affichage Transition PNG");
-            s1.classList.remove('active');
-            s2.classList.add('active');
+}, refreshInterval);
 
-            setTimeout(etape3News, tempsTransition);
-        }
+// Étape 1
+function afficherSource1() {
+    console.log("Source 1");
 
-        function etape3News() {
-            console.log("Étape 3 : Affichage News");
-            s2.classList.remove('active');
-            s3.classList.add('active');
+    s2.classList.remove("active");
+    s3.classList.remove("active");
+    s1.classList.add("active");
 
-            cycleCount++;
-            
-            // Rafraîchissement du flux News toutes les 30 min
-            if (cycleCount >= cyclesBeforeNewsRefresh) {
-                console.log("Rafraîchissement du flux de News en direct !");
-                s3.src = ""; 
-                setTimeout(() => { s3.src = "https://maxmcneil.github.io/mywebrankin/"; }, 100);
-                cycleCount = 0; 
-            }
+    setTimeout(afficherTransition, tempsSource1);
+}
 
-            setTimeout(etape4Ransomware, tempsNews);
-        }
+// Étape 2
+function afficherTransition() {
+    console.log("Transition");
 
-        function etape4Ransomware() {
-            console.log("Étape 4 : Affichage Ransomware France");
-            s3.classList.remove('active');
-            
-            // CORRECTION : On affiche l'iframe instantanément sans casser son cycle de vie ni vider son contenu
-            s4.classList.add('active');
+    s1.classList.remove("active");
+    s2.classList.add("active");
 
-            // Au bout d'une minute, on reboucle sur les dettes
-            setTimeout(etape1Dettes, tempsRansomware);
-        }
+    setTimeout(afficherNews, tempsTransition);
+}
 
-        window.onload = function() {
-            etape1Dettes();
-        };
-    </script>
+// Étape 3
+function afficherNews() {
+    console.log("France Live News");
+
+    s2.classList.remove("active");
+    s3.classList.add("active");
+
+    setTimeout(afficherSource1, tempsNews);
+}
+
+// Démarrage
+window.onload = () => {
+    afficherSource1();
+};
+</script>
+
 </body>
 </html>
