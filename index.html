@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contrôle Live OBS - 4 Sources</title>
+    <title>Contrôle Live OBS</title>
 
     <style>
         html, body {
@@ -24,7 +24,6 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity .5s ease-in-out;
-            display: block;
         }
 
         .active {
@@ -35,20 +34,12 @@
 </head>
 <body>
 
-    <!-- Source 1 -->
     <iframe id="s0" class="overlay-item" src="24update_overlay_live_1080x1920.html"></iframe>
-
-    <!-- Source 2 (Image) -->
     <img id="s1" class="overlay-item" src="file_00000000c15071f4829de158d17f3c07.png" alt="Transition">
-
-    <!-- Source 3 -->
     <iframe id="s2" class="overlay-item" src="https://maxmcneil.github.io/FranceLiveNews/"></iframe>
-
-    <!-- Source 4 -->
-    <iframe id="s3" class="overlay-item" src="https://https://maxmcneil.github.io/dls-monitor/"></iframe>
+    <iframe id="s3" class="overlay-item" src="https://maxmcneil.github.io/dls-monitor/"></iframe>
 
 <script>
-// Configuration des sources et durées (en millisecondes)
 const cycle = [
     { id: "s0", duration: 35000 },
     { id: "s1", duration: 20000 },
@@ -59,31 +50,25 @@ const cycle = [
 let currentIndex = 0;
 
 function afficherSource() {
-    // Masquer tout
     document.querySelectorAll('.overlay-item').forEach(el => el.classList.remove('active'));
-    
-    // Afficher la courante
     document.getElementById(cycle[currentIndex].id).classList.add('active');
 
-    // Programmer la suivante
     setTimeout(() => {
         currentIndex = (currentIndex + 1) % cycle.length;
         afficherSource();
     }, cycle[currentIndex].duration);
 }
 
-// Rafraîchissement complet des iframes toutes les 15 min
+// Rafraîchissement des iframes toutes les 15 min
 setInterval(() => {
-    console.log("Rafraîchissement global des sources...");
-    const iframes = document.querySelectorAll('iframe');
-    iframes.forEach(iframe => {
-        const currentSrc = iframe.src;
+    console.log("Rafraîchissement...");
+    document.querySelectorAll('iframe').forEach(iframe => {
+        const url = iframe.src;
         iframe.src = "";
-        setTimeout(() => { iframe.src = currentSrc; }, 100);
+        setTimeout(() => { iframe.src = url; }, 100);
     });
 }, 15 * 60 * 1000);
 
-// Démarrage
 window.onload = afficherSource;
 </script>
 
