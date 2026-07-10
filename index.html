@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Contrôle Live OBS - 3 Sources Automatiques</title>
+    <title>Contrôle Live OBS - 4 Sources</title>
 
     <style>
         html, body {
@@ -24,6 +24,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity .5s ease-in-out;
+            display: block;
         }
 
         .active {
@@ -35,88 +36,55 @@
 <body>
 
     <!-- Source 1 -->
-    <iframe
-        id="source1"
-        class="overlay-item"
-        src="24update overlay_live_1080x1920.html">
-    </iframe>
+    <iframe id="s0" class="overlay-item" src="24update_overlay_live_1080x1920.html"></iframe>
 
-    <!-- Transition -->
-    <img
-        id="source2"
-        class="overlay-item"
-        src="file_00000000c15071f4829de158d17f3c07.png"
-        alt="Transition">
+    <!-- Source 2 (Image) -->
+    <img id="s1" class="overlay-item" src="file_00000000c15071f4829de158d17f3c07.png" alt="Transition">
 
-    <!-- France Live News -->
-    <iframe
-        id="source3"
-        class="overlay-item"
-        src="https://maxmcneil.github.io/FranceLiveNews/">
-    </iframe>
+    <!-- Source 3 -->
+    <iframe id="s2" class="overlay-item" src="https://maxmcneil.github.io/FranceLiveNews/"></iframe>
+
+    <!-- Source 4 -->
+    <iframe id="s3" class="overlay-item" src="https://https://maxmcneil.github.io/dls-monitor/"></iframe>
 
 <script>
-const s1 = document.getElementById("source1");
-const s2 = document.getElementById("source2");
-const s3 = document.getElementById("source3");
+// Configuration des sources et durées (en millisecondes)
+const cycle = [
+    { id: "s0", duration: 35000 },
+    { id: "s1", duration: 20000 },
+    { id: "s2", duration: 90000 },
+    { id: "s3", duration: 90000 }
+];
 
-// Durées
-const tempsSource1 = 30000;      // 30 s
-const tempsTransition = 5000;    // 5 s
-const tempsNews = 60000;         // 1 min
+let currentIndex = 0;
 
-// Rafraîchissement des iframes toutes les 20 min
-const refreshInterval = 20 * 60 * 1000;
+function afficherSource() {
+    // Masquer tout
+    document.querySelectorAll('.overlay-item').forEach(el => el.classList.remove('active'));
+    
+    // Afficher la courante
+    document.getElementById(cycle[currentIndex].id).classList.add('active');
 
-// Rafraîchissement automatique
-setInterval(() => {
-    console.log("Rafraîchissement des iframes...");
-
-    s1.src = "";
-    s3.src = "";
-
+    // Programmer la suivante
     setTimeout(() => {
-        s1.src = "24update overlay_live_1080x1920.html";
-        s3.src = "https://maxmcneil.github.io/FranceLiveNews/";
-    }, 100);
-
-}, refreshInterval);
-
-// Étape 1
-function afficherSource1() {
-    console.log("Source 1");
-
-    s2.classList.remove("active");
-    s3.classList.remove("active");
-    s1.classList.add("active");
-
-    setTimeout(afficherTransition, tempsSource1);
+        currentIndex = (currentIndex + 1) % cycle.length;
+        afficherSource();
+    }, cycle[currentIndex].duration);
 }
 
-// Étape 2
-function afficherTransition() {
-    console.log("Transition");
-
-    s1.classList.remove("active");
-    s2.classList.add("active");
-
-    setTimeout(afficherNews, tempsTransition);
-}
-
-// Étape 3
-function afficherNews() {
-    console.log("France Live News");
-
-    s2.classList.remove("active");
-    s3.classList.add("active");
-
-    setTimeout(afficherSource1, tempsNews);
-}
+// Rafraîchissement complet des iframes toutes les 15 min
+setInterval(() => {
+    console.log("Rafraîchissement global des sources...");
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach(iframe => {
+        const currentSrc = iframe.src;
+        iframe.src = "";
+        setTimeout(() => { iframe.src = currentSrc; }, 100);
+    });
+}, 15 * 60 * 1000);
 
 // Démarrage
-window.onload = () => {
-    afficherSource1();
-};
+window.onload = afficherSource;
 </script>
 
 </body>
