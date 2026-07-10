@@ -278,12 +278,12 @@
 
         setInterval(() => { AudioBipeur.playBip(440, 0.05, 'sine', 0.04); }, 4000);
 
-        const QUESTIONS = [
-            "Faut-il geler le versement de toutes les aides sociales ?",
+                const QUESTIONS = [
+            "Faut-il geler immédiatement le versement de toutes les aides sociales ?",
             "Sommes-nous en train de détruire l'avenir des jeunes ?",
-            "L'État est-il en état de faillite cachée ?",
+            "L'État est-il en état de faillite virtuelle cachée ?",
             "Faut-il supprimer la moitié des fonctionnaires pour éponger la dette ?",
-            "Où passe l'argent public ? Services ou privilèges des hauts gradés ?",
+            "Où passe l'argent public ? Services ou pur gaspillage ?",
             "Taxer massivement les riches : solution miracle ou suicide économique ?",
             "Faillite complète d'ici 2030 : Scénario inévitable ?"
         ];
@@ -292,18 +292,32 @@
         const qTxtEl = document.getElementById('popup-question-text');
 
         function triggerPopupLoop() {
+            // Affichage du pop-up
             qTxtEl.innerText = QUESTIONS[qIndex];
+            
+            // Bip sonore à l'apparition
             AudioBipeur.playBip(880, 0.15, 'square', 0.15);
             setTimeout(() => AudioBipeur.playBip(1100, 0.10, 'sine', 0.15), 60);
+            
             popupEl.classList.add('active');
+
+            // Durée de visibilité : 5 secondes
             setTimeout(() => {
+                // Bip sonore à la disparition
                 AudioBipeur.playBip(350, 0.20, 'sine', 0.1);
                 popupEl.classList.remove('active');
+                
+                // Passage à la question suivante
                 qIndex = (qIndex + 1) % QUESTIONS.length;
-                setTimeout(triggerPopupLoop, 12000);
-            }, 8000);
+                
+                // Relance de la boucle dans 1 minute (60000ms - 5000ms = 55000ms d'attente)
+                // On attend 55s car le setTimeout précédent a déjà duré 5s
+                setTimeout(triggerPopupLoop, 55000);
+            }, 5000);
         }
-        setTimeout(triggerPopupLoop, 5000);
+
+        // Premier lancement
+        setTimeout(triggerPopupLoop, 60000);
     </script>
 </body>
 </html>
