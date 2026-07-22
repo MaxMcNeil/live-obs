@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Live Loop 1080x1920</title>
+<style>
+  html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:#000;}
+  .layer{
+    position:fixed; inset:0; width:100%; height:100%;
+    opacity:0; z-index:0;
+    transition:opacity 1.1s ease;
+    background:#000;
+  }
+  .layer.active{ opacity:1; z-index:5; }
+  .layer iframe{
+    width:100%; height:100%; border:0; display:block;
+  }
+  .layer img{
+    width:100%; height:100%; border:0; display:block; object-fit:contain;
+  }
+</style>
+</head>
+<body>
+
+<!-- 4 slides persistantes pour les sources fixes (jamais détruites / recréées) -->
+<div class="layer" id="slide-overlay"><iframe id="frame-overlay" src="24update_overlay_live_1080x1920.html"></iframe></div>
+<div class="layer" id="slide-dls"><iframe id="frame-dls" src="https://maxmcneil.github.io/dls-monitor/"></iframe></div>
+<div class="layer" id="slide-slideshow"><iframe id="frame-slideshow" src="https://maxmcneil.github.io/slideshow/"></iframe></div>
+<div class="layer" id="slide-news"><iframe id="frame-news" src="https://maxmcneil.github.io/FranceLiveNews/"></iframe></div>
+
+<!-- slide réutilisée pour les images dynamiques -->
+<div class="layer" id="slide-image"><img id="frame-image" src="" alt=""></div>
+
+<script>
+(function(){
+  // ================= CONFIG =================
+  // Si l'auto-détection ne fonctionne pas (ex: repo = username.github.io),
+  // remplace OWNER / REPO ci-dessous par des valeurs en dur.
+  let OWNER = location.hostname.split('.')[0];
+  let REPO  = location.pathname.split('/').filter(Boolean)[0] || '';
+
+  const FIXED_SOURCES = [
+    { id:'overlay',   el:'slide-overlay',   frame:'frame-overlay',   url:'24update_overlay_live_1080x1920.html',       duration:95  },
+    { id:'dls',       el:'slide-dls',       frame:'frame-dls',       url:'https://maxmcneil.github.io/dls-monitor/',    duration:240 },
+    { id:'slideshow', el:'slide-slideshow', frame:'frame-slideshow', url:'https://maxmcneil.github.io/slideshow/',      duration:600 },
+    { id:'news',      el:'slide-news',      frame:'frame-news',      url:'https://maxmcneil.github.io/FranceLiveNews/', duration:180 }
+  ];
+  const IMAGE_DURATION      = 30;              // secondes par image
+  const REFRESH_INTERVAL_MS = 30 * 60 * 1000;  // rafraîchir les sources toutes les 30 min
+  // ============================================
+
+  let images = [];        // images détectées dans /images
+  let playlist = [];
+  let currentIndex = -1;
+  let currentEl = null;
+  let refreshFlags = {};  // id -> true si un refresh est en attente
+  let timer = null;
+
+  function extIsImage(name){
+    return /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(name);
+  }
+
+  async function fetchImages(){
+    if(!REPO){ images = []; return; }
+    try{
+      const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/images`, {cache:'no-store'});
+      if(!res.ok){ images = []; return; }
+      const data = await res.json();
+      images = data
+        .filter(f => f.type === 'file' && extIsImage(f.name))
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .map(f => ({ name:f.name, url:f.download_url }));
+    }catch(e){
+      images = []; // ne jamais casser le live si la requête échoue
+    }
+  }
+
+  function buildPlaylist(){
+    const list = [];
+    images.forEach(img => list.push({ type:'image', url:img.url, duration:IMAGE_DURATION }));
+    FIXED_SOURCES.forEach(src => list.push({ type:'fixed', id:src.id, duration:src.duration }));
+    playlist = list;
+  }
+
+  function applyRefresh(src){
+    const frameEl = document.getElementById(src.frame);
+    if(!frameEl) return;
+    const bust = (src.url.includes('?') ? '&' : '?') + '_r=' + Date.now();
+    frameEl.src = src.url + bust;
+  }
+
+  function showLayer(elId){
+    // si la slide qu'on quitte a un refresh en attente, on l'applique maintenant (invisible pour le live)
+    if(currentEl && currentEl !== elId){
+      const prevSrc = FIXED_SOURCES.find(s => s.el === currentEl);
+      if(prevSrc && refreshFlags[prevSrc.id]){
+        applyRefresh(prevSrc);
+        refreshFlags[prevSrc.id] = false;
+      }
+    }
+    document.querySelectorAll('.layer').forEach(l => l.classList.remove('active'));
+    document.getElementById(elId).classList.add('active');
+    currentEl = elId;
+  }
+
+  function playIndex(idx){
+    if(playlist.length === 0){
+      timer = setTimeout(() => playIndex(idx), 1000);
+      return;
+    }
+    currentIndex = ((idx % playlist.length) + playlist.length) % playlist.length;
+    const item = playlist[currentIndex];
+
+    if(item.type === 'image'){
+      const imgEl = document.getElementById('frame-image');
+      imgEl.onerror = () => { // image supprimée entre-temps -> on saute sans casser le live
+        clearTimeout(timer);
+        playIndex(currentIndex + 1);
+      };
+      imgEl.src = item.url;
+      showLayer('slide-image');
+    } else {
+      const src = FIXED_SOURCES.find(s => s.id === item.id);
+      showLayer(src.el);
+    }
+
+    timer = setTimeout(() => {
+      const next = currentIndex + 1;
+      if(next >= playlist.length){
+        // fin de boucle complète : on remet à jour la liste d'images (ajouts/suppressions)
+        fetchImages().then(() => { buildPlaylist(); playIndex(0); });
+      } else {
+        playIndex(next);
+      }
+    }, item.duration * 1000);
+  }
+
+  function scheduleGlobalRefresh(){
+    setInterval(() => {
+      FIXED_SOURCES.forEach(src => {
+        if(currentEl === src.el){
+          refreshFlags[src.id] = true; // on attend qu'elle ne soit plus affichée
+        } else {
+          applyRefresh(src);
+        }
+      });
+    }, REFRESH_INTERVAL_MS);
+  }
+
+  (async function init(){
+    await fetchImages();
+    buildPlaylist();
+    scheduleGlobalRefresh();
+    playIndex(0);
+  })();
+})();
+</script>
+</body>
+</html>
